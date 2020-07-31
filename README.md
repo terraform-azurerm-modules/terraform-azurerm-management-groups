@@ -8,7 +8,7 @@ Note that this module is subject to breaking change as the management_groups var
 
 ### Deploying the Definitions
 
-It is very simple to get the policies deployed:
+It is very simple to get the management groups deployed:
 
 ```terraform
 module "management_groups" {
