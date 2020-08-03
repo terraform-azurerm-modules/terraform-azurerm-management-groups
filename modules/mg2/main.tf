@@ -1,15 +1,3 @@
-variable "level" {
-  type = number
-}
-
-variable "display_name" {}
-
-variable "parent_management_group_id" {}
-
-variable "children" {
-  type = map
-}
-
 locals {
   subscription_ids = flatten([
     for key, value in var.children :
@@ -38,24 +26,4 @@ module "mg3" {
   display_name               = each.key
   parent_management_group_id = azurerm_management_group.mg.id
   children                   = each.value
-}
-
-output "management_groups" {
-  value = flatten([
-    merge(azurerm_management_group.mg, { level = var.level }),
-    [
-      for name in keys(local.children) :
-      module.mg3[name].management_groups
-    ]
-  ])
-}
-
-output "management_group_id" {
-  value = merge({
-    id = azurerm_management_group.mg.id
-  },
-  {
-    for name in keys(local.children) :
-    name => module.mg3[name].management_group_id
-  })
 }

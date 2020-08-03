@@ -3,13 +3,13 @@ variable "management_groups" {
   default = {
     "Contoso" = {
       "Landing Zones" = {
-        "Corp" = {},
-        "Online"  = {}
+        "Corp"   = {},
+        "Online" = {}
       },
       "Platform" = {
-        "Management" = {},
-        "Connectivity"  = {},
-        "Identity"  = {},
+        "Management"   = {},
+        "Connectivity" = {},
+        "Identity"     = {},
       }
     }
   }
