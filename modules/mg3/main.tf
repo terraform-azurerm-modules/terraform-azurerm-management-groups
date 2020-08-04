@@ -22,8 +22,8 @@ module "mg4" {
   source   = "../mg4"
   for_each = local.children // var.level + 1 == 2 ? local.children : {}
 
-  level                      = local.next_level
-  display_name               = each.key
-  parent_management_group_id = azurerm_management_group.mg.id
-  children                   = each.value
+  level                          = local.next_level
+  display_name                   = each.key
+  parent_management_group_id     = azurerm_management_group.mg.id
+  children                       = each.value
 }
