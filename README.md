@@ -18,8 +18,7 @@ It is very simple to get the management groups deployed:
 module "management_groups" {
   source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.2"
 
-  parent_management_group_display_name = "Contoso
-"
+  parent_management_group_display_name = "Contoso"
 
   management_groups = {
     "Landing Zones" = {
@@ -49,13 +48,77 @@ module "management_groups" {
 
 ## Named Parent v Root Tenant Group
 
+### Named Parent
+
 The recommended approach is to have the AAD Global Admin elevate their access and create a single top level management group to represent the organisation. (Named parent.)
 
-Once that is done then either the name or id can be used as a module argument. Management groups can then be created by anyone with Owner, Contributor or Management Group Contributor role.
+Once that is done then either the name or id can be used as a module argument:
 
-You can use the module as an elevated user and create directly under the Root Tenant Group.
+* parent_management_group_display_name
+* parent_management_group_id
+
+Only one of these is required.
+
+Management groups can then be created by anyone with Owner, Contributor or Management Group Contributor role.
+
+### Root Tenant Group
+
+Alternatively you can define the arguments to create the management groups directly under the Root Tenant Group. Omit the two parent arguments and it will default to using the root tenant group as 
+
+You may need to be an elevated user to use the module in this way. 
 
 See the <https://docs.microsoft.com/azure/governance/management-groups/overview> page for more info.
+
+## Module output in use
+
+The output includes both nested objects keyed on the display name and also an array called my that contains the same information again. This makes the output very flexible, but also means that the full output object can become very large when the management group structure becomes deep.
+
+### Management Group IDs
+
+Here are a few example module output expressions, finding the resource ID of a specific management group:
+
+```terraform
+data "azurerm_client_config" "example" {}
+
+resource "azurerm_role_assignment" "example" {
+  scope                = module.management_groups.output.Platform.Connectivity.id
+  role_definition_name = "Reader"
+  principal_id         = data.azurerm_client_config.example.object_id
+}
+
+resource "azurerm_role_assignment" "example2" {
+  scope                = module.management_groups.output["Landing Zones"].Corp.id
+  role_definition_name = "Reader"
+  principal_id         = data.azurerm_client_config.example.object_id
+}
+
+resource "azurerm_role_assignment" "example3" {
+  scope                = module.management_groups.output["Landing Zones"]["Online"]["Non-Prod"].id
+  role_definition_name = "Reader"
+  principal_id         = data.azurerm_client_config.example.object_id
+}
+```
+
+### Using for_each and splat expressions
+
+You can also use `mg[*]` at any level to denote all children. This can be useful in specific scenarios.
+
+The "Landing Zones" section of the heierarchy has multiple business units / applications and could scale out over time. Each area has a Prod v Non-Prod split underneath.
+
+If you wanted to apply an assignment on all Prod sub-levels then you could use the following as an example:
+
+```terraform
+resource "azurerm_role_assignment" "example4" {
+  for_each = {
+    for scope in module.management_groups.output["Landing Zones"].mg[*].Prod.id :
+    basename(scope) => scope
+  }
+
+  role_definition_name = "Reader"
+  scope                = each.value
+  principal_id         = data.azurerm_client_config.example.object_id
+}
+```
 
 ## Output
 
@@ -153,45 +216,11 @@ In terms of child objects, you have a choice of using:
 * **mg** array of child objects, useful for splat operations
 * (**$names**) - individual named maps for each child object, e.g. Identity, Connectivity and Management above.
 
-You can see the last two in use below.
+You can see the last two used in the examples above.
 
-## Module Output In Use
-
-Some examples of usage:
-
-```terraform
-data "azurerm_client_config" "example" {}
-
-resource "azurerm_role_assignment" "example" {
-  scope                = module.management_groups.output.Platform.Connectivity.id
-  role_definition_name = "Reader"
-  principal_id         = data.azurerm_client_config.example.object_id
-}
-
-resource "azurerm_role_assignment" "example2" {
-  scope                = module.management_groups.output["Landing Zones"].Corp.id
-  role_definition_name = "Reader"
-  principal_id         = data.azurerm_client_config.example.object_id
-}
-
-resource "azurerm_role_assignment" "example3" {
-  scope                = module.management_groups.output["Landing Zones"]["Online"]["Non-Prod"].id
-  role_definition_name = "Reader"
-  principal_id         = data.azurerm_client_config.example.object_id
-}
-
-resource "azurerm_role_assignment" "example4" {
-  for_each = {
-    for scope in module.management_groups.output["Landing Zones"].mg[*].Prod.id :
-    basename(scope) => scope
-  }
-
-  role_definition_name = "Reader"
-  scope                = each.value
-  principal_id         = data.azurerm_client_config.example.object_id
-}
-```
 
 ## Warnings
 
-There is no lifecycle ignore for subscription_ids. There is no ability to dynamically control whether they are ignored or not.
+There is no lifecycle ignore for subscription_ids. There is currently no ability to dynamically control whether they are ignored or not.
+
+
