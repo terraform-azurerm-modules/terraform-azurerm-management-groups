@@ -16,7 +16,7 @@ It is very simple to get the management groups deployed:
 
 ```terraform
 module "management_groups" {
-  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.4"
+  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.3"
 
   parent_management_group_display_name = "Contoso"
 
