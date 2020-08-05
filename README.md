@@ -1,6 +1,6 @@
 # terraform-azurerm-management-groups
 
-This v0.13 module to create a nested Azure Management Group structure using a simple and dense input object.
+This v0.13 module creates a nested Azure Management Group structure using a simple and dense input object.
 
 For an overview, please read the [Management Groups](https://docs.microsoft.com/azure/governance/management-groups/overview) documentation.
 
@@ -16,7 +16,7 @@ It is very simple to get the management groups deployed:
 
 ```terraform
 module "management_groups" {
-  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.3"
+  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.4"
 
   parent_management_group_display_name = "Contoso"
 
@@ -46,28 +46,54 @@ module "management_groups" {
 }
 ```
 
-## Named Parent v Root Tenant Group
+### Parent
 
-### Named Parent
+The default parent is the root tenant group.
 
-The recommended approach is to have the AAD Global Admin elevate their access and create a single top level management group to represent the organisation. (Named parent.)
-
-Once that is done then either the name or id can be used as a module argument:
+You can specify an alternate parent management group using either:
 
 * parent_management_group_display_name
 * parent_management_group_id
 
 Only one of these is required.
 
-Management groups can then be created by anyone with Owner, Contributor or Management Group Contributor role.
+> See permissions section below.
 
-### Root Tenant Group
+## Permissions
 
-Alternatively you can define the arguments to create the management groups directly under the Root Tenant Group. Omit the two parent arguments and it will default to using the root tenant group as
+> _Note that this sections needs validation, and is only represents current understanding._
 
-You may need to be an elevated user to use the module in this way.
+Anyone with Owner or Contributor access on a subscription in that tenant can create the management groups themselves.
 
-See the <https://docs.microsoft.com/azure/governance/management-groups/overview> page for more info.
+Adding roles to management groups initially requires elevation from the
+
+Adding a subscription_id into a management group requires both:
+
+* `Microsoft.Authorization/roleAssignments` on the subscription (i.e. Owner or User Access Administrator)
+* `Microsoft.Management/managementGroups` on the management group (i.e. Management Group Contributor)
+
+Adding an RBAC role assignment to a management group requires:
+
+* `Microsoft.Authorization/roleAssignments` on the subscription (i.e. Owner or User Access Administrator)
+
+Adding a policy or policy set definition requires:
+
+* `Microsoft.Authorization/policyassignments` (i.e. Owner, Contributor, Resource Policy Contributor)
+
+References:
+
+* <https://docs.microsoft.com/azure/governance/management-groups/overview>
+* <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#owner>
+* <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#contributor>
+* <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#user-access-administrator>
+* <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#management-group-contributor>
+* <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#resource-policy-contributor>
+
+## Recommendation
+
+The recommended approach is to have the AAD Global Admin elevate their access and create a single top level management group to represent the organisation. The Global Admin can also add the required RBAC role assignments: for the security principal to create role assignments, policy assignments etc.
+
+Once that is done then either the name or id can be used as a module argument.
 
 ## Module output in use
 
@@ -222,3 +248,5 @@ You can see the last two used in the examples above.
 ## Warnings
 
 There is no lifecycle ignore for subscription_ids. There is currently no ability to dynamically control whether they are ignored or not.
+
+The output may be subject to breaking change based on any feedback and issues during the pre-release phase.
