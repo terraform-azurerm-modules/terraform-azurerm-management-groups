@@ -16,7 +16,7 @@ It is very simple to get the management groups deployed:
 
 ```terraform
 module "management_groups" {
-  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.2"
+  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.3"
 
   parent_management_group_display_name = "Contoso"
 
@@ -63,9 +63,9 @@ Management groups can then be created by anyone with Owner, Contributor or Manag
 
 ### Root Tenant Group
 
-Alternatively you can define the arguments to create the management groups directly under the Root Tenant Group. Omit the two parent arguments and it will default to using the root tenant group as 
+Alternatively you can define the arguments to create the management groups directly under the Root Tenant Group. Omit the two parent arguments and it will default to using the root tenant group as
 
-You may need to be an elevated user to use the module in this way. 
+You may need to be an elevated user to use the module in this way.
 
 See the <https://docs.microsoft.com/azure/governance/management-groups/overview> page for more info.
 
@@ -103,7 +103,7 @@ resource "azurerm_role_assignment" "example3" {
 
 You can also use `mg[*]` at any level to denote all children. This can be useful in specific scenarios.
 
-The "Landing Zones" section of the heierarchy has multiple business units / applications and could scale out over time. Each area has a Prod v Non-Prod split underneath.
+For example, the "Landing Zones" section of the hierarchy has multiple business units / applications and could scale out over time. Within each of those areas there is a Prod v Non-Prod split.
 
 If you wanted to apply an assignment on all Prod sub-levels then you could use the following as an example:
 
@@ -222,5 +222,3 @@ You can see the last two used in the examples above.
 ## Warnings
 
 There is no lifecycle ignore for subscription_ids. There is currently no ability to dynamically control whether they are ignored or not.
-
-
