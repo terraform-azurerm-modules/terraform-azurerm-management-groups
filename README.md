@@ -15,36 +15,40 @@ The output is a deep object with multiple nesting designed so that is can be use
 It is very simple to get the management groups deployed:
 
 ```terraform
-module "management_groups" {
-  source                = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.3"
+provider "azurerm" {
+  features {}
+}
 
-  parent_management_group_display_name = "Contoso"
+module "management_groups" {
+  source = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.3"
 
   management_groups = {
-    "Landing Zones" = {
-      "Corp" = {
-        "Prod"     = {},
-        "Non-Prod" = {},
+    "Contoso" = {
+      "Landing Zones" = {
+        "Corp" = {
+          "Prod"     = {},
+          "Non-Prod" = {},
+        },
+        "Online" = {
+          "Prod"     = {},
+          "Non-Prod" = {},
+        }
       },
-      "Online"  = {
-        "Prod"     = {},
-        "Non-Prod" = {},
+      "Platform" = {
+        "Management" = {
+        },
+        "Connectivity" = {
+          "subscription_ids" = ["2d31be49-d959-4415-bb65-8aec2c90ba62"]
+        },
+        "Identity" = {
+        },
       }
-    },
-    "Platform" = {
-      "Management" = {
-        "subscription_ids" = ["2ca40be1-7e80-4f2b-92f7-06b2123a68cc"]
-      },
-      "Connectivity"  = {
-        "subscription_ids" = ["2d31be49-d959-4415-bb65-8aec2c90ba62"]
-      },
-      "Identity"  = {
-        "subscription_ids" = ["9a52c25a-b883-437e-80a6-ff4c2bccd44e"]
-      },
     }
   }
 }
 ```
+
+Add your own lists of subscription GUID strings.
 
 ### Parent
 
@@ -56,8 +60,6 @@ You can specify an alternate parent management group using either:
 * parent_management_group_id
 
 Only one of these is required.
-
-> See permissions section below.
 
 ## Permissions
 
