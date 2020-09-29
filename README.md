@@ -6,7 +6,9 @@ For an overview, please read the [Management Groups](https://docs.microsoft.com/
 
 The default value for the input structure is based on [Enterprise-Scale](https://github.com/Azure/Enterprise-Scale).
 
-The input object has `type = any` for greater flexibility, including a mix and match of children and subscription ID lists at the same scope points. There is currently no use of type constraints or variable validation.
+The input object has `type = any` for greater flexibility, including a mix and match of children and optional `display_name` attributes at the same scope points. There is currently no use of type constraints or variable validation in this object.
+
+> Note that the management group name must contain only ASCII letters, digits, numbers, _, -, (, ) .
 
 The main key names map to the created Management Group `name` property. This cannot be changed once created. The `display_name` property can be optionally specified if you would like it to be different than the name.
 
