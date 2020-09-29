@@ -7,6 +7,12 @@ data "azurerm_subscription" "current" {}
 locals {
   parent               = var.parent_management_group_name != null ? true : false
   tenant_root_group_id = "/providers/Microsoft.Management/managementGroups/${data.azurerm_subscription.current.tenant_id}"
+  // This local checks for duplicate subscription IDs in the CSV
+  // It is not used in the plan but is useful to prevent failures on apply
+  subscription_to_mg_csv_data_check = {
+    for s in var.subscription_to_mg_csv_data :
+    s.subId => s.mgName
+  }
 }
 
 
