@@ -8,6 +8,8 @@ The default value for the input structure is based on [Enterprise-Scale](https:/
 
 The input object has `type = any` for greater flexibility, including a mix and match of children and subscription ID lists at the same scope points. There is currently no use of type constraints or variable validation.
 
+The main key names map to the created Management Group `name` property. This cannot be changed once created. The `display_name` property can be optionally specified if you would like it to be different than the name.
+
 The output is a deep object with multiple nesting designed so that is can be used with expressions that are very human readable. See below for more details.
 
 ## Example Use
@@ -20,11 +22,14 @@ provider "azurerm" {
 }
 
 module "management_groups" {
-  source = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.1.3"
+  source = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v2.0.0"
+
+  subscription_to_mg_csv_data  = csvdecode(file("subs.csv"))
 
   management_groups = {
     "Contoso" = {
-      "Landing Zones" = {
+      "LandingZones" = {
+        display_name = "Landing Zones"
         "Corp" = {
           "Prod"     = {},
           "Non-Prod" = {},
@@ -38,7 +43,6 @@ module "management_groups" {
         "Management" = {
         },
         "Connectivity" = {
-          "subscription_ids" = ["2d31be49-d959-4415-bb65-8aec2c90ba62"]
         },
         "Identity" = {
         },
@@ -48,7 +52,18 @@ module "management_groups" {
 }
 ```
 
-Add your own lists of subscription GUID strings.
+### Managing Subscriptions in Management Groups
+
+A simple CSV file is used to provide the mapping of subscription IDs to management group names. As an example:
+
+```csv
+subId,mgName
+e94d25de-c27a-4ed9-9868-ce06a34a6b8b,LandingZones
+a4666b85-0dcf-452b-94c8-e0e63c31b03b,LandingZones
+876b13ab-1386-4977-83f8-468511349907,Identity
+6a1c057a-11ce-4df1-8036-cd6661a82d27,Connectivity
+```
+The module will check for duplicate subscription IDs in the file and fail at the plan stage if found.
 
 ### Parent
 
@@ -101,7 +116,7 @@ Once that is done then either the name or id can be used as a module argument.
 
 The output includes both nested objects keyed on the display name and also an array called my that contains the same information again. This makes the output very flexible, but also means that the full output object can become very large when the management group structure becomes deep.
 
-### Management Group IDs
+### Management Group Names
 
 Here are a few example module output expressions, finding the resource ID of a specific management group:
 
@@ -115,13 +130,13 @@ resource "azurerm_role_assignment" "example" {
 }
 
 resource "azurerm_role_assignment" "example2" {
-  scope                = module.management_groups.output["Landing Zones"].Corp.id
+  scope                = module.management_groups.output["LandingZones"].Corp.id
   role_definition_name = "Reader"
   principal_id         = data.azurerm_client_config.example.object_id
 }
 
 resource "azurerm_role_assignment" "example3" {
-  scope                = module.management_groups.output["Landing Zones"]["Online"]["Non-Prod"].id
+  scope                = module.management_groups.output["LandingZones"]["Online"]["Non-Prod"].id
   role_definition_name = "Reader"
   principal_id         = data.azurerm_client_config.example.object_id
 }
@@ -131,7 +146,7 @@ resource "azurerm_role_assignment" "example3" {
 
 You can also use `mg[*]` at any level to denote all children. This can be useful in specific scenarios.
 
-For example, the "Landing Zones" section of the hierarchy has multiple business units / applications and could scale out over time. Within each of those areas there is a Prod v Non-Prod split.
+For example, the "LandingZones" section of the hierarchy has multiple business units / applications and could scale out over time. Within each of those areas there is a Prod v Non-Prod split.
 
 If you wanted to apply an assignment on all Prod sub-levels then you could use the following as an example:
 
