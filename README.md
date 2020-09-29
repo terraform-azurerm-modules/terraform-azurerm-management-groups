@@ -69,12 +69,9 @@ The module will check for duplicate subscription IDs in the file and fail at the
 
 The default parent is the root tenant group.
 
-You can specify an alternate parent management group using either:
+You can specify an alternate parent management group using:
 
-* parent_management_group_display_name
-* parent_management_group_id
-
-Only one of these is required.
+* parent_management_group_name
 
 ## Permissions
 
