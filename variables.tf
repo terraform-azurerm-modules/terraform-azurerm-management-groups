@@ -7,12 +7,11 @@ variable "parent_management_group_name" {
   default = null
 }
 
-/* variable "parent_management_group_display_name" {
-  type    = string
-  default = null
-} */
-
 variable "subscription_to_mg_csv_data" {
+  // This variable should be the csvdecode() output of a two column CSV file, e.g.:
+  // subId,mgName
+  // 167d4f7a-0484-44f1-a84f-93f07ff3c798,ES-LandingZones
+
   type    = any
   default = null
 }
@@ -26,6 +25,7 @@ variable "management_groups" {
   // The keys in this object are the Management Group name.
   // The name can only be an ASCII letter, digit, -, _, (, )
   // Specifying display_name is optional. If omitted the name is used.
+
   default = {
     "ES" = {
       display_name = "ES"
