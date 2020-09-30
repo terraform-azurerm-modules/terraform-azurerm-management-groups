@@ -1,4 +1,4 @@
-variable "parent_management_group_id" {
+variable "parent_management_group_name" {
   // The scope at which to create the management groups
   // If unspecified then will default to root tenant group, but this requires special permissions
   // <https://docs.microsoft.com/azure/governance/management-groups/overview>
@@ -7,8 +7,12 @@ variable "parent_management_group_id" {
   default = null
 }
 
-variable "parent_management_group_display_name" {
-  type    = string
+variable "subscription_to_mg_csv_data" {
+  // This variable should be the csvdecode() output of a two column CSV file, e.g.:
+  // subId,mgName
+  // 167d4f7a-0484-44f1-a84f-93f07ff3c798,ES-LandingZones
+
+  type    = any
   default = null
 }
 
@@ -18,18 +22,34 @@ variable "management_groups" {
 
   type = any
 
-  default = {
-    "Landing Zones" = {
-      "Corp"   = {},
-      "Online" = {}
-    },
-    "Platform" = {
-      "Management" = {},
-      "Connectivity" = {
-        subscription_ids = ["2d31be49-d959-4415-bb65-8aec2c90ba62"]
+  // The keys in this object are the Management Group name.
+  // The name can only be an ASCII letter, digit, -, _, (, )
+  // Specifying display_name is optional. If omitted the name is used.
 
+  default = {
+    "ES" = {
+      display_name = "ES"
+      "ES-LandingZones" = {
+        display_name = "LandingZones"
+        "ES-Corp" = {
+          display_name = "Corp"
+        },
+        "ES-Online" = {
+          display_name = "Online"
+        }
       },
-      "Identity" = {},
+      "ES-Platform" = {
+        display_name = "Platform"
+        "ES-Management" = {
+          display_name = "Management"
+        },
+        "ES-Connectivity" = {
+          display_name = "Connectivity"
+        },
+        "ES-Identity" = {
+          display_name = "Identity"
+        },
+      }
     }
   }
 }
