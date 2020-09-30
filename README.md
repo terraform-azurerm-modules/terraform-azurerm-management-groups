@@ -24,7 +24,7 @@ provider "azurerm" {
 }
 
 module "management_groups" {
-  source = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v2.0.0"
+  source = "github.com/terraform-azurerm-modules/terraform-azurerm-management-groups?ref=v0.2.0"
 
   subscription_to_mg_csv_data  = csvdecode(file("subs.csv"))
 
