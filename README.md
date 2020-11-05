@@ -33,12 +33,12 @@ module "management_groups" {
       "LandingZones" = {
         display_name = "Landing Zones"
         "Corp" = {
-          "Prod"     = {},
-          "Non-Prod" = {},
+          "Corp-Prod"     = {},
+          "Corp-Non-Prod" = {},
         },
         "Online" = {
-          "Prod"     = {},
-          "Non-Prod" = {},
+          "Online-Prod"     = {},
+          "Online-Non-Prod" = {},
         }
       },
       "Platform" = {
