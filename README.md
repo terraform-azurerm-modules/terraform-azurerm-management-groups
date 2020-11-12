@@ -31,28 +31,23 @@ module "management_groups" {
   management_groups = {
     "Contoso" = {
       "LandingZones" = {
-        display_name = "Landing Zones"
-        "Corp" = {
-          "Prod"     = {},
-          "Non-Prod" = {},
-        },
-        "Online" = {
-          "Prod"     = {},
-          "Non-Prod" = {},
-        }
+        display_name   = "Landing Zones"
+        "Corp"         = {},
+        "Online"       = {}
       },
       "Platform" = {
-        "Management" = {
-        },
-        "Connectivity" = {
-        },
-        "Identity" = {
-        },
-      }
+        "Management"   = {},
+        "Connectivity" = {},
+        "Identity"     = {},
+      },
+      "Sandbox"        = {},
+      "Decommissioned" = {}
     }
   }
 }
 ```
+
+It is recommended to use names without spaces, and to be consistent in capitalisation formats.
 
 ### Managing Subscriptions in Management Groups
 
@@ -60,8 +55,9 @@ A simple CSV file is used to provide the mapping of subscription IDs to manageme
 
 ```csv
 subId,mgName
-e94d25de-c27a-4ed9-9868-ce06a34a6b8b,LandingZones
-a4666b85-0dcf-452b-94c8-e0e63c31b03b,LandingZones
+e94d25de-c27a-4ed9-9868-ce06a34a6b8b,Corp
+a4666b85-0dcf-452b-94c8-e0e63c31b03b,Online
+a4012b85-0bad-452b-1976-e0e5a11fe3ab,Online
 876b13ab-1386-4977-83f8-468511349907,Identity
 6a1c057a-11ce-4df1-8036-cd6661a82d27,Connectivity
 ```
@@ -81,7 +77,7 @@ You can specify an alternate parent management group using:
 
 Anyone with Owner or Contributor access on a subscription in that tenant can create the management groups themselves.
 
-Adding roles to management groups initially requires elevation from the
+Adding roles to management groups initially requires elevation from the Domain Admin.
 
 Adding a subscription_id into a management group requires both:
 
@@ -141,30 +137,9 @@ resource "azurerm_role_assignment" "example3" {
 }
 ```
 
-### Using for_each and splat expressions
-
-You can also use `mg[*]` at any level to denote all children. This can be useful in specific scenarios.
-
-For example, the "LandingZones" section of the hierarchy has multiple business units / applications and could scale out over time. Within each of those areas there is a Prod v Non-Prod split.
-
-If you wanted to apply an assignment on all Prod sub-levels then you could use the following as an example:
-
-```terraform
-resource "azurerm_role_assignment" "example4" {
-  for_each = {
-    for scope in module.management_groups.output["Landing Zones"].mg[*].Prod.id :
-    basename(scope) => scope
-  }
-
-  role_definition_name = "Reader"
-  scope                = each.value
-  principal_id         = data.azurerm_client_config.example.object_id
-}
-```
-
 ## Output
 
-The module creates a nested output object called "output".
+The module creates a nested output object called "output". THis output is subject to breaking change before productionisation.
 
 The object can become very large when there are multiple levels, so the example output below has been truncated to only show the output for the Platform section.
 
@@ -263,6 +238,8 @@ You can see the last two used in the examples above.
 
 ## Warnings
 
-There is no lifecycle ignore for subscription_ids. There is currently no ability to dynamically control whether they are ignored or not.
+Lifecycle ignore is switched on for subscription_ids. There is currently no ability to dynamically control whether they are ignored or not.
+
+There is an upcoming azurerm_management_group_subscription_association resource. Once available, this module will be simplified to use it. 
 
 The output may be subject to breaking change based on any feedback and issues during the pre-release phase.
