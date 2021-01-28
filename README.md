@@ -111,11 +111,15 @@ Using the same example usage of this module from [above](#example-use), lets ass
 
 > You need to have your Terraform backend configured and Terraform initialised (init) before doing the below import!
 
-An example of how use ```terraform import``` to import the **"Contoso"** Management Group based on the above example is shown below:
+An example of how use ```terraform import``` to import the **"Contoso"** Management Group based on the above example is shown below using PowerShell (including PowerShell Core):
 
-```pwsh
+```powershell
+
+terraform import 'module.management_groups.module.mg1[\"Contoso\"].azurerm_management_group.mg' /providers/Microsoft.Management/managementGroups/Contoso
 
 ```
+
+> Please note the character escaping required around the **"Contoso"** Management Group due to using PowerShell. Further information for other OS's can be found [here](https://www.terraform.io/docs/cli/commands/import.html#example-import-into-resource-configured-with-for_each).
 
 ## Recommendation
 
