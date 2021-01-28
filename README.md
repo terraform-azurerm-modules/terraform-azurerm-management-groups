@@ -77,7 +77,7 @@ You can specify an alternate parent management group using:
 
 Anyone with Owner or Contributor access on a subscription in that tenant can create the management groups themselves.
 
-Adding roles to management groups initially requires elevation from the Domain Admin.
+Adding roles to management groups initially requires elevation from the Global Admin.
 
 Adding a subscription_id into a management group requires both:
 
@@ -100,6 +100,22 @@ References:
 * <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#user-access-administrator>
 * <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#management-group-contributor>
 * <https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#resource-policy-contributor>
+
+## Import an existing Management Group into Terraform State
+
+You may find yourself in a scenario where a Management Group may already exist that you want to manage with this module in your hierarchy. 
+
+A common example of this scenario is where you are not permitted to have permissions on the Tenant Root Scope "/", but the department/user with those permissions, or they can elevate into that permission, may be willing to create your top level Management Group and assign you permissions upon it. This would enable you to only create the hierarchy from this manually created Management Group level and downwards in the scope, without having any permissions over other hierarchies within the Tenant or permissions over the entire Tenant; this is very common in large enterprise deployments.
+
+Using the same example usage of this module from [above](#example-use), lets assume the **"Contoso"** top level Management Group in the defined hierarchy has been manually created outside of your Terraform code, and therefore not present in your Terraform state file. So before you can run Terraform Plan & Apply to create your required hierarchy you need to import the existing Management Group into your Terraform State file using the ```terraform import``` command.
+
+> You need to have your Terraform backend configured and Terraform initialised (init) before doing the below import!
+
+An example of how use ```terraform import``` to import the **"Contoso"** Management Group based on the above example is shown below:
+
+```pwsh
+
+```
 
 ## Recommendation
 
