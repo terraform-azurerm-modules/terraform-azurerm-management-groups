@@ -1,5 +1,12 @@
 # terraform-azurerm-management-groups
 
+⚠️ Note that we highly recommend the official Microsoft Terraform modules.
+
+* <https://aka.ms/alz/tf> - Official Microsoft Terraform module for Azure Landing Zones
+* <https://aka.ms/alz/tf/wiki> - Wiki with instructions for use
+
+## Overview
+
 This v0.13 module creates a nested Azure Management Group structure using a simple and dense input object.
 
 For an overview, please read the [Management Groups](https://docs.microsoft.com/azure/governance/management-groups/overview) documentation.
@@ -103,7 +110,7 @@ References:
 
 ## Import an existing Management Group into Terraform State
 
-You may find yourself in a scenario where a Management Group may already exist that you want to manage with this module in your hierarchy. 
+You may find yourself in a scenario where a Management Group may already exist that you want to manage with this module in your hierarchy.
 
 A common example of this scenario is where you are not permitted to have permissions on the Tenant Root Scope "/", but the department/user with those permissions, or they can elevate into that permission, may be willing to create your top level Management Group and assign you permissions upon it. This would enable you to only create the hierarchy from this manually created Management Group level and downwards in the scope, without having any permissions over other hierarchies within the Tenant or permissions over the entire Tenant; this is very common in large enterprise deployments.
 
@@ -260,6 +267,6 @@ You can see the last two used in the examples above.
 
 Lifecycle ignore is switched on for subscription_ids. There is currently no ability to dynamically control whether they are ignored or not.
 
-There is an upcoming azurerm_management_group_subscription_association resource. Once available, this module will be simplified to use it. 
+There is an upcoming azurerm_management_group_subscription_association resource. Once available, this module will be simplified to use it.
 
 The output may be subject to breaking change based on any feedback and issues during the pre-release phase.
